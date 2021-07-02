@@ -1,0 +1,2058 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-06-28T00:15:13Z</date>
+    <groups>
+        <group>
+            <name>Templates/SAN</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template Huawei OceanStor 5000 V3 SNMP v1.1</template>
+            <name>Template Huawei OceanStor 5000 V3 SNMP v1.1</name>
+            <description>兼容：&#13;
+Huawei OceanStor Dorado5000 V3</description>
+            <templates>
+                <template>
+                    <name>Template Module Generic SNMP</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Templates/SAN</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>存储信息</name>
+                </application>
+                <application>
+                    <name>控制器</name>
+                </application>
+                <application>
+                    <name>电源-BBU</name>
+                </application>
+                <application>
+                    <name>磁盘</name>
+                </application>
+                <application>
+                    <name>设备框</name>
+                </application>
+                <application>
+                    <name>风扇</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>存储可用容量 (%)</name>
+                    <type>CALCULATED</type>
+                    <key>oceanstor[freeCapacity]</key>
+                    <history>7d</history>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>100*(last(&quot;oceanstor[totalCapacity]&quot;) - last(&quot;oceanstor[usedCapacity]&quot;)) / last(&quot;oceanstor[totalCapacity]&quot;)</params>
+                    <description>存储可用容量 (%)</description>
+                    <applications>
+                        <application>
+                            <name>存储信息</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;10</expression>
+                            <name>存储可用空间&lt; 10 %</name>
+                            <priority>AVERAGE</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>存储运行状态</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.4.1.34774.4.1.1.3.0</snmp_oid>
+                    <key>oceanstor[status]</key>
+                    <history>7d</history>
+                    <trends>0</trends>
+                    <description>存储运行状态</description>
+                    <applications>
+                        <application>
+                            <name>存储信息</name>
+                        </application>
+                    </applications>
+                    <valuemap>
+                        <name>Huawei storage::Running status</name>
+                    </valuemap>
+                    <preprocessing>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <params>6h</params>
+                        </step>
+                    </preprocessing>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;&gt;1</expression>
+                            <name>存储运行情况异常</name>
+                            <priority>HIGH</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>存储总容量</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.4.1.34774.4.1.1.5.0</snmp_oid>
+                    <key>oceanstor[totalCapacity]</key>
+                    <delay>1h</delay>
+                    <history>7d</history>
+                    <units>B</units>
+                    <description>存储总容量</description>
+                    <applications>
+                        <application>
+                            <name>存储信息</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <params>1048576</params>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <params>12h</params>
+                        </step>
+                    </preprocessing>
+                </item>
+                <item>
+                    <name>存储已用容量</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.4.1.34774.4.1.1.4.0</snmp_oid>
+                    <key>oceanstor[usedCapacity]</key>
+                    <history>7d</history>
+                    <units>B</units>
+                    <description>存储已用容量</description>
+                    <applications>
+                        <application>
+                            <name>存储信息</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <params>1048576</params>
+                        </step>
+                    </preprocessing>
+                </item>
+                <item>
+                    <name>存储软件版本</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.4.1.34774.4.1.1.6.0</snmp_oid>
+                    <key>oceanstor[version]</key>
+                    <delay>1h</delay>
+                    <history>7d</history>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <description>存储软件版本</description>
+                    <applications>
+                        <application>
+                            <name>存储信息</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <params>12h</params>
+                        </step>
+                    </preprocessing>
+                </item>
+            </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>BBU discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#ID},1.3.6.1.4.1.34774.4.1.23.5.5.1.1,{#LOCATION},1.3.6.1.4.1.34774.4.1.23.5.5.1.2]</snmp_oid>
+                    <key>oceanstor.bbu.discovery</key>
+                    <delay>1h</delay>
+                    <description>备用电源</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>备用电源 {#ID} 位置 {#LOCATION}: 健康状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.5.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoBBUHealthStatus, &quot;{#ID}:{#LOCATION}&quot;]</key>
+                            <history>7d</history>
+                            <applications>
+                                <application>
+                                    <name>电源-BBU</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Health status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;1</expression>
+                                    <name>备用电源 {#ID} 位置 {#LOCATION}: 健康状态异常</name>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>备用电源 {#ID} 位置 {#LOCATION}: 充放电次数</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.5.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoBBUNumberOfDischarges, &quot;{#ID}:{#LOCATION}&quot;]</key>
+                            <delay>10m</delay>
+                            <history>7d</history>
+                            <units>次</units>
+                            <applications>
+                                <application>
+                                    <name>电源-BBU</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>备用电源 {#ID} 位置 {#LOCATION}: 运行状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.5.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoBBURunningStatus, &quot;{#ID}:{#LOCATION}&quot;]</key>
+                            <history>7d</history>
+                            <applications>
+                                <application>
+                                    <name>电源-BBU</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Running status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;27</expression>
+                                    <name>备用电源 {#ID} 位置 {#LOCATION}: 运行状态异常</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Controller discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#ID},1.3.6.1.4.1.34774.4.1.23.5.2.1.1]</snmp_oid>
+                    <key>oceanstor.controller.discovery</key>
+                    <delay>1h</delay>
+                    <description>控制器</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>控制器 {#ID}: CPU使用率</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.2.1.8.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoControllerCPUUsage, &quot;{#ID}&quot;]</key>
+                            <history>7d</history>
+                            <value_type>FLOAT</value_type>
+                            <units>%</units>
+                            <description>控制器CPU使用率</description>
+                            <applications>
+                                <application>
+                                    <name>控制器</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last(,5m)}&gt; {$OCEANSTOR.CPU.CRIT}</expression>
+                                    <name>控制器 {#ID}: CPU使用率 &gt; {$OCEANSTOR.CPU.CRIT}% for 5m</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>控制器 {#ID}: 健康状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.2.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoControllerHealthStatus, &quot;{#ID}&quot;]</key>
+                            <history>7d</history>
+                            <description>控制器健康状态</description>
+                            <applications>
+                                <application>
+                                    <name>控制器</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Health status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;1</expression>
+                                    <name>控制器 {#ID}: 健康状态异常</name>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>控制器 {#ID}: 内存使用率</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.2.1.9.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoControllerMemoryUsage, &quot;{#ID}&quot;]</key>
+                            <history>7d</history>
+                            <units>%</units>
+                            <description>控制器内存使用率</description>
+                            <applications>
+                                <application>
+                                    <name>控制器</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last(,5m)}&gt;{$OCEANSTOR.MEM.CRIT}</expression>
+                                    <name>控制器 {#ID}: 内存使用率 &gt; {$OCEANSTOR.MEM.CRIT}% for 5m</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>控制器 {#ID}: 角色</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.2.1.6.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoControllerRole, &quot;{#ID}&quot;]</key>
+                            <history>7d</history>
+                            <description>控制器角色</description>
+                            <applications>
+                                <application>
+                                    <name>控制器</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Controller role</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{diff()}=1</expression>
+                                    <name>控制器 {#ID}: 发生角色切换</name>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>控制器 {#ID}: 运行状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.2.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoControllerRunningStatus, &quot;{#ID}&quot;]</key>
+                            <history>7d</history>
+                            <applications>
+                                <application>
+                                    <name>控制器</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Running status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;27</expression>
+                                    <name>控制器 {#ID}: 运行状态异常</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>控制器 {#ID}: CPU使用率</name>
+                            <ymin_type_1>FIXED</ymin_type_1>
+                            <ymax_type_1>FIXED</ymax_type_1>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>199C0D</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwInfoControllerCPUUsage, &quot;{#ID}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Disk discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#ID},1.3.6.1.4.1.34774.4.1.23.5.1.1.1,{#MODEL},1.3.6.1.4.1.34774.4.1.23.5.1.1.12,{#LOCATION},1.3.6.1.4.1.34774.4.1.23.5.1.1.4]</snmp_oid>
+                    <key>oceanstor.disk.discovery</key>
+                    <delay>1h</delay>
+                    <description>磁盘</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>磁盘 {#MODEL} 位置 {#LOCATION}: 健康评分</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.1.1.25.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoDiskHealthMark, &quot;{#ID}&quot;]</key>
+                            <history>7d</history>
+                            <status>DISABLED</status>
+                            <discover>NO_DISCOVER</discover>
+                            <applications>
+                                <application>
+                                    <name>磁盘</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>磁盘 {#MODEL} 位置 {#LOCATION}: 健康状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.1.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoDiskHealthStatus, &quot;{#ID}&quot;]</key>
+                            <history>7d</history>
+                            <description>磁盘健康状态</description>
+                            <applications>
+                                <application>
+                                    <name>磁盘</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Health status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;1</expression>
+                                    <name>磁盘 {#MODEL} 位置 {#LOCATION}: 健康状态异常</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>磁盘 {#MODEL} 位置 {#LOCATION}: 运行状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.1.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoDiskrRnningStatus, &quot;{#ID}&quot;]</key>
+                            <history>7d</history>
+                            <description>磁盘运行状态</description>
+                            <applications>
+                                <application>
+                                    <name>磁盘</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Running status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;27</expression>
+                                    <name>磁盘 {#MODEL} 位置 {#LOCATION}: 运行状态异常</name>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>磁盘 {#MODEL} 位置 {#LOCATION}: 温度</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.1.1.11.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoDiskTemperature, &quot;{#ID}&quot;]</key>
+                            <history>7d</history>
+                            <units>℃</units>
+                            <description>磁盘温度</description>
+                            <applications>
+                                <application>
+                                    <name>磁盘</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Running status</name>
+                            </valuemap>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{min({$OCEANSTOR.DISK.TEMP.MAX.TIME})}&gt;{$OCEANSTOR.TMP.MAX.WARN}</expression>
+                                    <name>磁盘 {#MODEL} 位置 {#LOCATION}: 温度过高 &gt;{$OCEANSTOR.TMP.MAX.WARN}℃ for {$OCEANSTOR.DISK.TEMP.MAX.TIME}</name>
+                                    <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Enclosure discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#NAME},1.3.6.1.4.1.34774.4.1.23.5.6.1.2]</snmp_oid>
+                    <key>oceanstor.enclosure.discovery</key>
+                    <delay>1h</delay>
+                    <description>设备框</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>设备框 {#NAME}：健康状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.6.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoEnclosureHealthStatus, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <applications>
+                                <application>
+                                    <name>设备框</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Health status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;1</expression>
+                                    <name>设备柜 {#NAME}: 健康状态异常</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>设备框 {#NAME}：运行状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.6.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoEnclosureRunningStatus, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <applications>
+                                <application>
+                                    <name>设备框</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Running status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;27</expression>
+                                    <name>设备柜 {#NAME}: 运行状态异常</name>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>设备框 {#NAME}：序列号</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.6.1.9.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoEnclosureSn, &quot;{#NAME}&quot;]</key>
+                            <delay>10m</delay>
+                            <history>7d</history>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>设备框</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>1d</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>设备框 {#NAME}：温度</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.6.1.8.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoEnclosureTemperature, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>℃</units>
+                            <applications>
+                                <application>
+                                    <name>设备框</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{min(3m)}&gt;&quot;{$OCEANSTOR.TMP.MAX.WARN}&quot;</expression>
+                                    <name>设备框 {#NAME}: 温度过高&gt; {$OCEANSTOR.TMP.MAX.WARN} ℃ for 3m</name>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>FAN discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#ID},1.3.6.1.4.1.34774.4.1.23.5.4.1.1,{#LOCATION},1.3.6.1.4.1.34774.4.1.23.5.4.1.2]</snmp_oid>
+                    <key>oceanstor.fan.discovery</key>
+                    <delay>1h</delay>
+                    <description>风扇</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>风扇 {#ID} 位置 {#LOCATION}: 健康状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.4.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoFanHealthStatus, &quot;{#ID}:{#LOCATION}&quot;]</key>
+                            <history>7d</history>
+                            <applications>
+                                <application>
+                                    <name>风扇</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Health status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;1</expression>
+                                    <name>风扇 {#ID} 位置 {#LOCATION}: 健康状态异常</name>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>风扇 {#ID} 位置 {#LOCATION}: 运行状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.4.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoFanRunningStatus, &quot;{#ID}:{#LOCATION}&quot;]</key>
+                            <history>7d</history>
+                            <applications>
+                                <application>
+                                    <name>风扇</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Running status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;2</expression>
+                                    <name>风扇 {#ID} 位置 {#LOCATION}: 运行状态异常</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>LUN discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#NAME},1.3.6.1.4.1.34774.4.1.19.9.4.1.2]</snmp_oid>
+                    <key>oceanstor.lun.discovery</key>
+                    <delay>1h</delay>
+                    <description>逻辑单元号，逻辑磁盘</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>LUN {#NAME}: 平均I/O响应时间</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.4.1.13.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfLunAverageIOResponseTime, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>ms</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>LUN {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>0.001</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{min(5m)}&gt;{$OCEANSTOR.LUN.IO.MAX.WARN}</expression>
+                                    <name>LUN {#NAME}: 平均 I/O 响应时间 &gt; {$OCEANSTOR.LUN.IO.MAX.WARN} ms for 5m</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>LUN {#NAME}: 平均读I/O响应时间</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.4.1.15.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfLunAverageReadIOLatency, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>ms</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>LUN {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>0.001</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>LUN {#NAME}: 平均写I/O响应时间</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.4.1.16.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfLunAverageWriteIOLatency, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>ms</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>LUN {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>0.001</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>LUN {#NAME}: 当前读IOPS</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.4.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfLunReadIOPS, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>iops</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>LUN {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>LUN {#NAME}: 当前读带宽</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.4.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfLunReadTraffic, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>Bps</units>
+                            <description>Bps=B/s</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>LUN {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1048576</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>LUN {#NAME}: 当前 IOPS</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.4.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfLunTotalIOPS, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>iops</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>LUN {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>LUN {#NAME}: 当前带宽</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.4.1.6.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfLunTotalTraffic, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>Bps</units>
+                            <description>Bps=B/s</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>LUN {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1048576</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>LUN {#NAME}: 当前写IOPS</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.4.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfLunWriteIOPS, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>iops</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>LUN {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>LUN {#NAME}: 当前写带宽</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.4.1.8.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfLunWriteTraffic, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>Bps</units>
+                            <description>Bps=B/s</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>LUN {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1048576</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>LUN {#NAME}: 容量</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.19.9.4.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwStorageLunCapacity, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>B</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>LUN {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1024</params>
+                                </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>LUN {#NAME}: 状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.19.9.4.1.11.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwStorageLunStatus, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>LUN {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <valuemap>
+                                <name>Huawei storage::LUN status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;1</expression>
+                                    <name>LUN {#NAME}: 状态异常</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>LUN {#NAME}: LUN I/O 信息</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>199C0D</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfLunTotalIOPS, &quot;{#NAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>F63100</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfLunWriteIOPS, &quot;{#NAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>3</sortorder>
+                                    <color>2774A4</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfLunReadIOPS, &quot;{#NAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>LUN {#NAME}: LUN I/O 响应时间</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>199C0D</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfLunAverageIOResponseTime, &quot;{#NAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>F63100</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfLunAverageWriteIOLatency, &quot;{#NAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>3</sortorder>
+                                    <color>2774A4</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfLunAverageReadIOLatency, &quot;{#NAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>LUN {#NAME}: LUN 流量</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>199C0D</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfLunTotalTraffic, &quot;{#NAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>F63100</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfLunWriteTraffic, &quot;{#NAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>3</sortorder>
+                                    <color>2774A4</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfLunReadTraffic, &quot;{#NAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Node discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#NODE},1.3.6.1.4.1.34774.4.1.21.3.1.1]</snmp_oid>
+                    <key>oceanstor.node.discovery</key>
+                    <delay>1h</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>节点 {#NODE}: CPU 使用率</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.3.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfNodeCPUUsage, &quot;{#NODE}&quot;]</key>
+                            <history>7d</history>
+                            <value_type>FLOAT</value_type>
+                            <units>%</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>节点 {#NODE}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last(,5m)}&gt;{$OCEANSTOR.CPU.CRIT}</expression>
+                                    <name>节点 {#NODE}: CPU使用率 &gt;{$OCEANSTOR.CPU.CRIT} % for 5m</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>节点 {#NODE}: 读IOPS</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.3.1.6.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfNodeReadIOPS, &quot;{#NODE}&quot;]</key>
+                            <history>7d</history>
+                            <units>iops</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>节点 {#NODE}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>节点 {#NODE}: 读带宽</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.3.1.9.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfNodeReadTraffic, &quot;{#NODE}&quot;]</key>
+                            <history>7d</history>
+                            <units>Bps</units>
+                            <description>Bps=B/s</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>节点 {#NODE}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1048576</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>节点 {#NODE}: 总IOPS</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.3.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfNodeTotalIOPS, &quot;{#NODE}&quot;]</key>
+                            <history>7d</history>
+                            <units>iops</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>节点 {#NODE}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>节点 {#NODE}: 总带宽</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.3.1.8.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfNodeTotalTraffic, &quot;{#NODE}&quot;]</key>
+                            <history>7d</history>
+                            <units>Bps</units>
+                            <description>Bps=B/s</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>节点 {#NODE}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1048576</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>节点 {#NODE}: 写IOPS</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.3.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfNodeWriteIOPS, &quot;{#NODE}&quot;]</key>
+                            <history>7d</history>
+                            <units>iops</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>节点 {#NODE}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>节点 {#NODE}: 写带宽</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.21.3.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwPerfNodeWriteTraffic, &quot;{#NODE}&quot;]</key>
+                            <history>7d</history>
+                            <units>Bps</units>
+                            <description>Bps=B/s</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>节点 {#NODE}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1048576</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>节点 {#NODE}: CPU 使用率</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <drawtype>GRADIENT_LINE</drawtype>
+                                    <color>199C0D</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfNodeCPUUsage, &quot;{#NODE}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>节点 {#NODE}: IO</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfNodeTotalIOPS, &quot;{#NODE}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>F63100</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfNodeWriteIOPS, &quot;{#NODE}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>3</sortorder>
+                                    <color>2774A4</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfNodeReadIOPS, &quot;{#NODE}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>节点 {#NODE}: 带宽</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfNodeTotalTraffic, &quot;{#NODE}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>F63100</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfNodeWriteTraffic, &quot;{#NODE}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>3</sortorder>
+                                    <color>2774A4</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwPerfNodeReadTraffic, &quot;{#NODE}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Storage pool discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#NAME},1.3.6.1.4.1.34774.4.1.23.4.2.1.2,{#THRESHOLD},1.3.6.1.4.1.34774.4.1.23.4.2.1.14]</snmp_oid>
+                    <key>oceanstor.pool.discovery</key>
+                    <delay>1h</delay>
+                    <description>存储池</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>存储池 {#NAME}: 可用容量</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.4.2.1.9.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoStoragePoolFreeCapacity, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>B</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>存储池 {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1048576</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>存储池 {#NAME}: 可用容量 (%)</name>
+                            <type>CALCULATED</type>
+                            <key>oceanstor.[hwInfoStoragePoolFreeCapacityPer, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>%</units>
+                            <params>100*last(&quot;oceanstor.[hwInfoStoragePoolFreeCapacity, \&quot;{#NAME}\&quot;]&quot;)/last(&quot;oceanstor.[hwInfoStoragePoolTotalCapacity, \&quot;{#NAME}\&quot;]&quot;)</params>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>存储池 {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{max(5m)}&lt;(100-{#THRESHOLD})</expression>
+                                    <name>存储池 {#NAME}：可用容量&lt; 100-{#THRESHOLD} %</name>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>存储池 {#NAME}: 健康状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.4.2.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoStoragePoolHealthStatus, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>存储池 {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <valuemap>
+                                <name>Huawei storage::Health status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;1</expression>
+                                    <name>存储池 {#NAME}：健康状态异常</name>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>存储池 {#NAME}: 运行状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.4.2.1.6.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoStoragePoolRunningStatus, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>存储池 {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <valuemap>
+                                <name>Huawei storage::Running status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;27</expression>
+                                    <name>存储池 {#NAME}：运行状态异常</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>存储池 {#NAME}: 已用容量</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.4.2.1.8.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoStoragePoolSubscribedCapacity, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>B</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>存储池 {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1048576</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>存储池 {#NAME}: 总容量</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.4.2.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoStoragePoolTotalCapacity, &quot;{#NAME}&quot;]</key>
+                            <history>7d</history>
+                            <units>B</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>存储池 {#NAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1048576</params>
+                                </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>存储池 {#NAME}: 容量</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>F63100</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwInfoStoragePoolSubscribedCapacity, &quot;{#NAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>2774A4</color>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwInfoStoragePoolTotalCapacity, &quot;{#NAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>3</sortorder>
+                                    <color>F7941D</color>
+                                    <yaxisside>RIGHT</yaxisside>
+                                    <item>
+                                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                                        <key>oceanstor.[hwInfoStoragePoolFreeCapacityPer, &quot;{#NAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Power discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#ID},1.3.6.1.4.1.34774.4.1.23.5.3.1.1,{#LOCATION},1.3.6.1.4.1.34774.4.1.23.5.3.1.2]</snmp_oid>
+                    <key>oceanstor.power.discovery</key>
+                    <delay>1h</delay>
+                    <description>电源</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>电源模块 {#ID} 位置 {#LOCATION}: 健康状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.3.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoPowerHealthStatus, &quot;{#ID}:{#LOCATION}&quot;]</key>
+                            <history>7d</history>
+                            <applications>
+                                <application>
+                                    <name>电源-BBU</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Health status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;1</expression>
+                                    <name>电源 {#ID} 位置 {#LOCATION}: 健康状态异常</name>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>电源模块 {#ID} 位置 {#LOCATION}: 运行状态</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.34774.4.1.23.5.3.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>oceanstor.[hwInfoPowerRunningStatus, &quot;{#ID}:{#LOCATION}&quot;]</key>
+                            <history>7d</history>
+                            <applications>
+                                <application>
+                                    <name>电源-BBU</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Huawei storage::Running status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>6h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;27</expression>
+                                    <name>备用电源 {#ID} 位置 {#LOCATION}: 运行状态异常</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+            </discovery_rules>
+            <macros>
+                <macro>
+                    <macro>{$HUAWEI.5300.DISK.TEMP.MAX.WARN}</macro>
+                    <value>45</value>
+                    <description>磁盘温度</description>
+                </macro>
+                <macro>
+                    <macro>{$OCEANSTOR.CPU.CRIT}</macro>
+                    <value>80</value>
+                </macro>
+                <macro>
+                    <macro>{$OCEANSTOR.DISK.TEMP.MAX.TIME}</macro>
+                    <value>5m</value>
+                    <description>磁盘告警时间</description>
+                </macro>
+                <macro>
+                    <macro>{$OCEANSTOR.LUN.IO.MAX.WARN}</macro>
+                    <value>100</value>
+                </macro>
+                <macro>
+                    <macro>{$OCEANSTOR.MEM.CRIT}</macro>
+                    <value>80</value>
+                </macro>
+                <macro>
+                    <macro>{$OCEANSTOR.TMP.MAX.WARN}</macro>
+                    <value>40</value>
+                    <description>设备框温度</description>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+    <graphs>
+        <graph>
+            <name>Huawei OceanStor:存储空间</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                        <key>oceanstor[totalCapacity]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>2774A4</color>
+                    <item>
+                        <host>Template Huawei OceanStor 5000 V3 SNMP v1.1</host>
+                        <key>oceanstor[usedCapacity]</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+    </graphs>
+    <value_maps>
+        <value_map>
+            <name>Huawei storage::Controller role</name>
+            <mappings>
+                <mapping>
+                    <value>0</value>
+                    <newvalue>普通成员</newvalue>
+                </mapping>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>集群主</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>集群备</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>Huawei storage::Health status</name>
+            <mappings>
+                <mapping>
+                    <value>0</value>
+                    <newvalue>未知</newvalue>
+                </mapping>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>正常</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>故障</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>即将故障</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>部分损坏</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>降级</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>有坏块</newvalue>
+                </mapping>
+                <mapping>
+                    <value>7</value>
+                    <newvalue>有误码</newvalue>
+                </mapping>
+                <mapping>
+                    <value>8</value>
+                    <newvalue>一致</newvalue>
+                </mapping>
+                <mapping>
+                    <value>9</value>
+                    <newvalue>不一致</newvalue>
+                </mapping>
+                <mapping>
+                    <value>10</value>
+                    <newvalue>繁忙</newvalue>
+                </mapping>
+                <mapping>
+                    <value>11</value>
+                    <newvalue>无输入</newvalue>
+                </mapping>
+                <mapping>
+                    <value>12</value>
+                    <newvalue>电量不足</newvalue>
+                </mapping>
+                <mapping>
+                    <value>13</value>
+                    <newvalue>单链路故障</newvalue>
+                </mapping>
+                <mapping>
+                    <value>14</value>
+                    <newvalue>失效</newvalue>
+                </mapping>
+                <mapping>
+                    <value>15</value>
+                    <newvalue>写保护</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>Huawei storage::LUN status</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>正常</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>故障</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>未格式化</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>正在格式化</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>Huawei storage::Running status</name>
+            <mappings>
+                <mapping>
+                    <value>0</value>
+                    <newvalue>未知</newvalue>
+                </mapping>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>正常</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>运行</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>未运行</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>不存在</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>高温休眠</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>正在启动</newvalue>
+                </mapping>
+                <mapping>
+                    <value>7</value>
+                    <newvalue>掉电保护</newvalue>
+                </mapping>
+                <mapping>
+                    <value>8</value>
+                    <newvalue>休眠</newvalue>
+                </mapping>
+                <mapping>
+                    <value>9</value>
+                    <newvalue>已启动</newvalue>
+                </mapping>
+                <mapping>
+                    <value>10</value>
+                    <newvalue>已连接</newvalue>
+                </mapping>
+                <mapping>
+                    <value>11</value>
+                    <newvalue>未连接</newvalue>
+                </mapping>
+                <mapping>
+                    <value>12</value>
+                    <newvalue>正在上电</newvalue>
+                </mapping>
+                <mapping>
+                    <value>13</value>
+                    <newvalue>已下电</newvalue>
+                </mapping>
+                <mapping>
+                    <value>14</value>
+                    <newvalue>预拷贝</newvalue>
+                </mapping>
+                <mapping>
+                    <value>15</value>
+                    <newvalue>回拷</newvalue>
+                </mapping>
+                <mapping>
+                    <value>16</value>
+                    <newvalue>重构</newvalue>
+                </mapping>
+                <mapping>
+                    <value>17</value>
+                    <newvalue>扩容</newvalue>
+                </mapping>
+                <mapping>
+                    <value>18</value>
+                    <newvalue>未格式化</newvalue>
+                </mapping>
+                <mapping>
+                    <value>19</value>
+                    <newvalue>正在格式化</newvalue>
+                </mapping>
+                <mapping>
+                    <value>20</value>
+                    <newvalue>未映射</newvalue>
+                </mapping>
+                <mapping>
+                    <value>21</value>
+                    <newvalue>正在初始同步</newvalue>
+                </mapping>
+                <mapping>
+                    <value>22</value>
+                    <newvalue>数据一致</newvalue>
+                </mapping>
+                <mapping>
+                    <value>23</value>
+                    <newvalue>正在同步</newvalue>
+                </mapping>
+                <mapping>
+                    <value>24</value>
+                    <newvalue>已同步</newvalue>
+                </mapping>
+                <mapping>
+                    <value>25</value>
+                    <newvalue>未同步</newvalue>
+                </mapping>
+                <mapping>
+                    <value>26</value>
+                    <newvalue>已分裂</newvalue>
+                </mapping>
+                <mapping>
+                    <value>27</value>
+                    <newvalue>在线</newvalue>
+                </mapping>
+                <mapping>
+                    <value>28</value>
+                    <newvalue>离线</newvalue>
+                </mapping>
+                <mapping>
+                    <value>29</value>
+                    <newvalue>已锁定</newvalue>
+                </mapping>
+                <mapping>
+                    <value>30</value>
+                    <newvalue>已启用</newvalue>
+                </mapping>
+                <mapping>
+                    <value>31</value>
+                    <newvalue>已禁用</newvalue>
+                </mapping>
+                <mapping>
+                    <value>32</value>
+                    <newvalue>正在均衡</newvalue>
+                </mapping>
+                <mapping>
+                    <value>33</value>
+                    <newvalue>待恢复</newvalue>
+                </mapping>
+                <mapping>
+                    <value>34</value>
+                    <newvalue>异常断开</newvalue>
+                </mapping>
+                <mapping>
+                    <value>35</value>
+                    <newvalue>失效</newvalue>
+                </mapping>
+                <mapping>
+                    <value>36</value>
+                    <newvalue>为启动</newvalue>
+                </mapping>
+                <mapping>
+                    <value>37</value>
+                    <newvalue>正在排队</newvalue>
+                </mapping>
+                <mapping>
+                    <value>38</value>
+                    <newvalue>已停止</newvalue>
+                </mapping>
+                <mapping>
+                    <value>39</value>
+                    <newvalue>正在拷贝</newvalue>
+                </mapping>
+                <mapping>
+                    <value>40</value>
+                    <newvalue>拷贝完成/完成</newvalue>
+                </mapping>
+                <mapping>
+                    <value>41</value>
+                    <newvalue>暂停</newvalue>
+                </mapping>
+                <mapping>
+                    <value>42</value>
+                    <newvalue>正在反向同步</newvalue>
+                </mapping>
+                <mapping>
+                    <value>43</value>
+                    <newvalue>已激活</newvalue>
+                </mapping>
+                <mapping>
+                    <value>44</value>
+                    <newvalue>正在回滚</newvalue>
+                </mapping>
+                <mapping>
+                    <value>45</value>
+                    <newvalue>未激活</newvalue>
+                </mapping>
+                <mapping>
+                    <value>46</value>
+                    <newvalue>等待</newvalue>
+                </mapping>
+                <mapping>
+                    <value>47</value>
+                    <newvalue>正在下电</newvalue>
+                </mapping>
+                <mapping>
+                    <value>48</value>
+                    <newvalue>正在充电</newvalue>
+                </mapping>
+                <mapping>
+                    <value>49</value>
+                    <newvalue>充电完成</newvalue>
+                </mapping>
+                <mapping>
+                    <value>50</value>
+                    <newvalue>正在放点</newvalue>
+                </mapping>
+                <mapping>
+                    <value>51</value>
+                    <newvalue>正在升级</newvalue>
+                </mapping>
+                <mapping>
+                    <value>52</value>
+                    <newvalue>掉电中</newvalue>
+                </mapping>
+                <mapping>
+                    <value>53</value>
+                    <newvalue>初始化中</newvalue>
+                </mapping>
+                <mapping>
+                    <value>54</value>
+                    <newvalue>正在应用变更</newvalue>
+                </mapping>
+                <mapping>
+                    <value>55</value>
+                    <newvalue>在线禁用</newvalue>
+                </mapping>
+                <mapping>
+                    <value>56</value>
+                    <newvalue>离线禁用</newvalue>
+                </mapping>
+                <mapping>
+                    <value>57</value>
+                    <newvalue>在线冻结</newvalue>
+                </mapping>
+                <mapping>
+                    <value>58</value>
+                    <newvalue>离线冻结</newvalue>
+                </mapping>
+                <mapping>
+                    <value>59</value>
+                    <newvalue>已关闭</newvalue>
+                </mapping>
+                <mapping>
+                    <value>60</value>
+                    <newvalue>(节点)删除中</newvalue>
+                </mapping>
+                <mapping>
+                    <value>61</value>
+                    <newvalue>服务中</newvalue>
+                </mapping>
+                <mapping>
+                    <value>62</value>
+                    <newvalue>退出服务</newvalue>
+                </mapping>
+                <mapping>
+                    <value>63</value>
+                    <newvalue>正在销毁</newvalue>
+                </mapping>
+                <mapping>
+                    <value>64</value>
+                    <newvalue>销毁失效</newvalue>
+                </mapping>
+                <mapping>
+                    <value>65</value>
+                    <newvalue>销毁成功</newvalue>
+                </mapping>
+                <mapping>
+                    <value>66</value>
+                    <newvalue>任务执行成功</newvalue>
+                </mapping>
+                <mapping>
+                    <value>67</value>
+                    <newvalue>任务执行失败</newvalue>
+                </mapping>
+                <mapping>
+                    <value>68</value>
+                    <newvalue>任务正在等待</newvalue>
+                </mapping>
+                <mapping>
+                    <value>69</value>
+                    <newvalue>任务正在取消</newvalue>
+                </mapping>
+                <mapping>
+                    <value>70</value>
+                    <newvalue>任务已取消</newvalue>
+                </mapping>
+                <mapping>
+                    <value>71</value>
+                    <newvalue>在线|即将灾备同步</newvalue>
+                </mapping>
+                <mapping>
+                    <value>72</value>
+                    <newvalue>在线|正在灾备同步</newvalue>
+                </mapping>
+                <mapping>
+                    <value>73</value>
+                    <newvalue>在线|灾备同步失败</newvalue>
+                </mapping>
+                <mapping>
+                    <value>74</value>
+                    <newvalue>迁移故障</newvalue>
+                </mapping>
+                <mapping>
+                    <value>75</value>
+                    <newvalue>迁移中</newvalue>
+                </mapping>
+                <mapping>
+                    <value>76</value>
+                    <newvalue>迁移完成</newvalue>
+                </mapping>
+                <mapping>
+                    <value>77</value>
+                    <newvalue>正在激活</newvalue>
+                </mapping>
+                <mapping>
+                    <value>78</value>
+                    <newvalue>正在取消激活</newvalue>
+                </mapping>
+                <mapping>
+                    <value>79</value>
+                    <newvalue>启动失败</newvalue>
+                </mapping>
+                <mapping>
+                    <value>80</value>
+                    <newvalue>停止失败</newvalue>
+                </mapping>
+                <mapping>
+                    <value>81</value>
+                    <newvalue>正在退出服务</newvalue>
+                </mapping>
+                <mapping>
+                    <value>82</value>
+                    <newvalue>已经退出服务</newvalue>
+                </mapping>
+                <mapping>
+                    <value>83</value>
+                    <newvalue>重新进入服务</newvalue>
+                </mapping>
+                <mapping>
+                    <value>84</value>
+                    <newvalue>正在替换节点</newvalue>
+                </mapping>
+                <mapping>
+                    <value>85</value>
+                    <newvalue>正在调度</newvalue>
+                </mapping>
+                <mapping>
+                    <value>86</value>
+                    <newvalue>暂停中</newvalue>
+                </mapping>
+                <mapping>
+                    <value>87</value>
+                    <newvalue>挂起中</newvalue>
+                </mapping>
+                <mapping>
+                    <value>88</value>
+                    <newvalue>挂起</newvalue>
+                </mapping>
+                <mapping>
+                    <value>89</value>
+                    <newvalue>超载</newvalue>
+                </mapping>
+                <mapping>
+                    <value>90</value>
+                    <newvalue>等待切换</newvalue>
+                </mapping>
+                <mapping>
+                    <value>91</value>
+                    <newvalue>切换中</newvalue>
+                </mapping>
+                <mapping>
+                    <value>92</value>
+                    <newvalue>等待清理</newvalue>
+                </mapping>
+                <mapping>
+                    <value>93</value>
+                    <newvalue>运行状态：强制启动</newvalue>
+                </mapping>
+                <mapping>
+                    <value>94</value>
+                    <newvalue>运行状态：故障</newvalue>
+                </mapping>
+                <mapping>
+                    <value>95</value>
+                    <newvalue>任务结束</newvalue>
+                </mapping>
+                <mapping>
+                    <value>96</value>
+                    <newvalue>分区迁移中</newvalue>
+                </mapping>
+                <mapping>
+                    <value>97</value>
+                    <newvalue>已挂载</newvalue>
+                </mapping>
+                <mapping>
+                    <value>98</value>
+                    <newvalue>为挂载</newvalue>
+                </mapping>
+                <mapping>
+                    <value>99</value>
+                    <newvalue>正在安装中</newvalue>
+                </mapping>
+                <mapping>
+                    <value>100</value>
+                    <newvalue>待同步</newvalue>
+                </mapping>
+                <mapping>
+                    <value>101</value>
+                    <newvalue>正在连接</newvalue>
+                </mapping>
+                <mapping>
+                    <value>102</value>
+                    <newvalue>服务正在切换中</newvalue>
+                </mapping>
+                <mapping>
+                    <value>103</value>
+                    <newvalue>上电失败</newvalue>
+                </mapping>
+                <mapping>
+                    <value>104</value>
+                    <newvalue>修复中</newvalue>
+                </mapping>
+                <mapping>
+                    <value>105</value>
+                    <newvalue>异常</newvalue>
+                </mapping>
+                <mapping>
+                    <value>106</value>
+                    <newvalue>删除中</newvalue>
+                </mapping>
+                <mapping>
+                    <value>107</value>
+                    <newvalue>修改中</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+    </value_maps>
+</zabbix_export>
